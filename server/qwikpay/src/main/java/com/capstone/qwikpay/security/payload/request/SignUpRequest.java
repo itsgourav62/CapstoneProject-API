@@ -49,7 +49,7 @@ public class SignUpRequest {
 		this.address = address;
 		this.gender = gender;
 	}
-
+	
 	public String getUsername() {
 		return username;
 	}
