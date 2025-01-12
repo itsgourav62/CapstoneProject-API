@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class SignupRequest {
+public class SignUpRequest {
 	@NotBlank
 	@Size(min = 3, max = 20)
 	private String username;
@@ -33,11 +33,11 @@ public class SignupRequest {
 	@Size(max = 11)
 	private String gender;
 
-	public SignupRequest() {
+	public SignUpRequest() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SignupRequest(@NotBlank @Size(min = 3, max = 20) String username,
+	public SignUpRequest(@NotBlank @Size(min = 3, max = 20) String username,
 			@NotBlank @Size(max = 50) @Email String email, Set<String> role,
 			@NotBlank @Size(min = 6, max = 40) String password, @NotBlank @Size(max = 10) String mobile,
 			@NotBlank @Size(max = 220) String address, @NotBlank @Size(max = 11) String gender) {

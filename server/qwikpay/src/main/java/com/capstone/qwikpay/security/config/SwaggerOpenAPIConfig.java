@@ -16,7 +16,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 //@SecurityScheme(name = "Bearer Authentication", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 //@OpenAPIDefinition(security = {SecurityRequirement(name = "BearerAuthentication") })
-public class SwaggerOpenApiConfig {
+public class SwaggerOpenAPIConfig {
 	@Bean
 	public OpenAPI springOpenAPI() {
 		//final String securitySchemeName = "bearerAuth";
