@@ -25,7 +25,7 @@ import com.capstone.qwikpay.repositories.RoleRepository;
 import com.capstone.qwikpay.repositories.UserRepository;
 import com.capstone.qwikpay.security.jwt.JwtUtils;
 import com.capstone.qwikpay.security.payload.request.LoginRequest;
-import com.capstone.qwikpay.security.payload.request.SignupRequest;
+import com.capstone.qwikpay.security.payload.request.SignUpRequest;
 import com.capstone.qwikpay.security.payload.response.JwtResponse;
 import com.capstone.qwikpay.security.payload.response.MessageResponse;
 import com.capstone.qwikpay.services.UserDetailsImpl;
@@ -92,7 +92,7 @@ public class AuthController {
 	 
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
 		}
@@ -118,7 +118,7 @@ public class AuthController {
 	}
 	
 	//Get Roles from DB if not present in SignupRequest
-	public Set<Role> getRoles(SignupRequest signupRequest){
+	public Set<Role> getRoles(SignUpRequest signupRequest){
 		Set<String> strRoles = signupRequest.getRole();
 		Set<Role> roles = new HashSet<>();
 
