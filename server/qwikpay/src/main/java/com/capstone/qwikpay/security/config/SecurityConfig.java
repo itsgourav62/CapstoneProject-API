@@ -58,6 +58,11 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> 
                 authorize.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll() // Allow public requests
+                    // Secure TransactionController endpoints
+                    .requestMatchers("/api/transactions/{transactionId}").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/api/transactions/transactions/{paymentId}").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/api/transactions/createTransaction").hasRole("ADMIN")
+                    // Other secured endpoints
                     .requestMatchers("/greet").hasRole("USER")
                     .requestMatchers("/admingreet").hasRole("ADMIN")
                     .requestMatchers("/api/customer/delete/**").hasRole("ADMIN")
@@ -80,6 +85,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

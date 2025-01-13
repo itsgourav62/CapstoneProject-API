@@ -49,4 +49,5 @@ public class Bill {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 }
