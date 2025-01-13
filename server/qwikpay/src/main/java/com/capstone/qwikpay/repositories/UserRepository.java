@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.capstone.qwikpay.entities.UserEntity;
 
 @Repository
-public interface UserRepository extends CrudRepository<UserEntity, Long> {
+public interface UserRepository extends CrudRepository<UserEntity, Integer> {
 	public Optional<UserEntity> findByUsername(String username);
 
 	public Boolean existsByUsername(String username);

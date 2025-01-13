@@ -29,5 +29,5 @@ jwtExpirationMs: 86400000
 logging:
   level:
     org.springframework.security: DEBUG
-    com.training.basicspringsecuritydemousingdb.security: DEBUG
+    #com.training.basicspringsecuritydemousingdb.security: DEBUG
     org.springframework.web.filter: DEBUG

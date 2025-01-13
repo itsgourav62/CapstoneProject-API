@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,15 +23,15 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    public final static String[] PUBLIC_REQUEST_MATCHERS = { 
+        "/api/auth/**", 
+        "/swagger-ui/**", 
+        "/v3/api-docs/**", 
+        "/h2-console/**" // Allow access to H2 Console 
+    };
+
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-
-    public final static String[] PUBLIC_REQUEST_MATCHERS = {
-        "/api/auth/**",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/h2-console/**" // Allow access to H2 Console
-    };
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -55,31 +54,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
-            .authorizeHttpRequests(authorize -> 
-                authorize.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll() // Allow public requests
-                    // Secure TransactionController endpoints
-                    .requestMatchers("/api/transactions/{transactionId}").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/api/transactions/transactions/{paymentId}").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/api/transactions/createTransaction").hasRole("ADMIN")
-                    // Other secured endpoints
-                    .requestMatchers("/greet").hasRole("USER")
-                    .requestMatchers("/admingreet").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/delete/**").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/update").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/new").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/get/**").permitAll()
-                    .requestMatchers("/api/customer/customers").hasAnyRole("USER", "ADMIN")
+            // Allow requests to H2 console and public endpoints
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
+                .requestMatchers("/api/user/delete/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/update/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/get/**").permitAll()
+                .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/user/**").hasRole("USER")
+                .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills").hasRole("ADMIN")
+                .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/transactions/{transactionId}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/transactions/transactions/{paymentId}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/transactions/createTransaction").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
-            .headers(headers -> 
-                headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // Enable H2 Console access
-            )
-            .exceptionHandling(exception -> 
-                exception.authenticationEntryPoint(unauthorizedHandler)
-            )
-            .sessionManagement(session -> 
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+            
+            // Disable CSRF for H2 console and APIs
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
+            
+            // Allow frames for H2 console
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+            
+            // Configure exception handling and session management
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Configure authentication provider and add JWT filter
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

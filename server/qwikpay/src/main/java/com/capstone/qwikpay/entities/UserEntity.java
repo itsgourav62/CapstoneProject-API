@@ -23,7 +23,7 @@ import jakarta.validation.constraints.Size;
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private Integer id;
 
 	@NotBlank
 	@Size(max = 20)
@@ -58,7 +58,7 @@ public class UserEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserEntity(Long id, @NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 50) @Email String email,
+	public UserEntity(Integer id, @NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 50) @Email String email,
 			@NotBlank @Size(max = 120) String password, @NotBlank @Size(max = 10) String mobile,
 			@NotBlank @Size(max = 220) String address, @NotBlank @Size(max = 11) String gender, Set<Role> roles) {
 		this.id = id;
@@ -77,11 +77,11 @@ public class UserEntity {
 		this.password = password;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -140,5 +140,7 @@ public class UserEntity {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
+	
 	
 }
