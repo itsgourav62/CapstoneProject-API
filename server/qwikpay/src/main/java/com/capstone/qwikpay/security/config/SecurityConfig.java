@@ -64,6 +64,14 @@ public class SecurityConfig {
                     .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN") // Bill access by status for both roles
                     .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")     // Single bill retrieval allowed for both roles
                     .requestMatchers("/api/bills").hasRole("ADMIN") // Only admins can create or modify bills
+                    
+                    
+                    //Payment API access control
+                    .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN") // Process a payment can be done by both USER and ADMIN
+                    .requestMatchers("/api/payments/validate/**").hasAnyRole("USER", "ADMIN") // Validate payment by ID
+                    .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN") // Retrieve payment by ID
+                    .requestMatchers("/api/payments").hasRole("ADMIN") // Admin can view all payments
+                    
             )
             .headers(headers -> 
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // Enable H2 Console access
