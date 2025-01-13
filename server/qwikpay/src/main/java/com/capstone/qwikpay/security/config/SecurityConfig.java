@@ -58,13 +58,20 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> 
                 authorize.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll() // Allow public requests
-                    .requestMatchers("/greet").hasRole("USER")
-                    .requestMatchers("/admingreet").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/delete/**").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/update").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/new").hasRole("ADMIN")
-                    .requestMatchers("/api/customer/get/**").permitAll()
-                    .requestMatchers("/api/customer/customers").hasAnyRole("USER", "ADMIN")
+                    // Bill API access control
+                    .requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN") // All bill endpoints restricted to authenticated users
+                    .requestMatchers("/api/bills/user/**").hasRole("USER")       // Bill access by user ID restricted to ROLE_USER
+                    .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN") // Bill access by status for both roles
+                    .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")     // Single bill retrieval allowed for both roles
+                    .requestMatchers("/api/bills").hasRole("ADMIN") // Only admins can create or modify bills
+                    
+                    
+                    //Payment API access control
+                    .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN") // Process a payment can be done by both USER and ADMIN
+                    .requestMatchers("/api/payments/validate/**").hasAnyRole("USER", "ADMIN") // Validate payment by ID
+                    .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN") // Retrieve payment by ID
+                    .requestMatchers("/api/payments").hasRole("ADMIN") // Admin can view all payments
+                    
             )
             .headers(headers -> 
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // Enable H2 Console access
