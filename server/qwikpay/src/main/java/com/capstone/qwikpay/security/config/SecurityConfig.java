@@ -55,23 +55,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
-            .authorizeHttpRequests(authorize -> 
-                authorize.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll() // Allow public requests
-                    // Bill API access control
-                    .requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN") // All bill endpoints restricted to authenticated users
-                    .requestMatchers("/api/bills/user/**").hasRole("USER")       // Bill access by user ID restricted to ROLE_USER
-                    .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN") // Bill access by status for both roles
-                    .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")     // Single bill retrieval allowed for both roles
-                    .requestMatchers("/api/bills").hasRole("ADMIN") // Only admins can create or modify bills
-                    
-                    
-                    //Payment API access control
-                    .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN") // Process a payment can be done by both USER and ADMIN
-                    .requestMatchers("/api/payments/validate/**").hasAnyRole("USER", "ADMIN") // Validate payment by ID
-                    .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN") // Retrieve payment by ID
-                    .requestMatchers("/api/payments").hasRole("ADMIN") // Admin can view all payments
-                    
+            // Authorize requests
+            .authorizeHttpRequests(authorize -> authorize
+            	.requestMatchers("/api/user/delete/**").hasRole("ADMIN")
+            	.requestMatchers("/api/user/update/**").hasRole("ADMIN")
+            	.requestMatchers("/api/user/new/**").hasRole("ADMIN")
+            	.requestMatchers("/api/user/get/**").permitAll()
+            	.requestMatchers("/api/user/users").hasAnyRole("USER","ADMIN")
+            	.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
+               // .anyRequest().authenticated()
             )
             .headers(headers -> 
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // Enable H2 Console access
