@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.capstone.qwikpay.entities.ERole;
 import com.capstone.qwikpay.entities.Role;
 import com.capstone.qwikpay.entities.UserEntity;
+import com.capstone.qwikpay.enums.ERole;
 import com.capstone.qwikpay.repositories.RoleRepository;
 import com.capstone.qwikpay.repositories.UserRepository;
 import com.capstone.qwikpay.security.jwt.JwtUtils;
@@ -100,6 +100,7 @@ public class AuthController {
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
 		}
+		
 		// Create new user's account
 		UserEntity user = new UserEntity(signUpRequest.getUsername(), signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));
@@ -135,18 +136,17 @@ public class AuthController {
 					roles.add(adminRole);
 
 					break;
-//				case "child":
-//					Role childRole = roleRepository.findByName(ERole.ROLE_CHILD)
-//							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//					roles.add(childRole);
-//
-//					break;
-//				case "parent":
-//					Role parentRole = roleRepository.findByName(ERole.ROLE_PARENT)
-//							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//					roles.add(parentRole);
-//
-//					break;
+				/*
+				 * case "child": Role childRole = roleRepository.findByName(ERole.ROLE_CHILD)
+				 * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+				 * roles.add(childRole);
+				 * 
+				 * break; case "parent": Role parentRole =
+				 * roleRepository.findByName(ERole.ROLE_PARENT) .orElseThrow(() -> new
+				 * RuntimeException("Error: Role is not found.")); roles.add(parentRole);
+				 * 
+				 * break;
+				 */
 				default:
 					Role userRole = roleRepository.findByName(ERole.ROLE_USER)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));

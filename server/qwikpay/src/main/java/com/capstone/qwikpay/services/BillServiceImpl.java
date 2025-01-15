@@ -52,12 +52,12 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill updateBillById(Integer billId, Bill updatedBill) {
         Bill bill = getBillById(billId);
-        bill.setUserId(updatedBill.getUserId());
+//        bill.setUserId(updatedBill.getUserId());
         bill.setAmount(updatedBill.getAmount());
         bill.setBillStatus(updatedBill.getBillStatus());
         bill.setDescription(updatedBill.getDescription());
         bill.setDueDate(updatedBill.getDueDate());
-        bill.setPaymentDate(updatedBill.getPaymentDate());
+//        bill.setPaymentDate(updatedBill.getPaymentDate());
         bill.setUpdatedAt(java.time.LocalDateTime.now());
         return billRepository.save(bill);
     }

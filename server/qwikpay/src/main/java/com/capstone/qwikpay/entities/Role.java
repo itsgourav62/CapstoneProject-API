@@ -1,5 +1,7 @@
 package com.capstone.qwikpay.entities;
 
+import com.capstone.qwikpay.enums.ERole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

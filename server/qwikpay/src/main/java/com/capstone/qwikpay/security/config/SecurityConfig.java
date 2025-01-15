@@ -23,6 +23,7 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+
     public final static String[] PUBLIC_REQUEST_MATCHERS = { 
         "/api/auth/**", 
         "/swagger-ui/**", 
@@ -53,8 +54,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+      
             // Allow requests to H2 console and public endpoints
+            // Authorize requests
+        http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
                 .requestMatchers("/api/user/delete/**").hasRole("ADMIN")
@@ -62,17 +65,22 @@ public class SecurityConfig {
                 .requestMatchers("/api/user/new/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/get/**").permitAll()
                 .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/user/**").hasRole("USER")
-                .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills").hasRole("ADMIN")
+                 // Bill API access control
+                .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/user/{userId}").hasRole("ADMIN")
+                .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
+
+                // Payment API access control
                 .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
             )
+            
             
             // Disable CSRF for H2 console and APIs
             .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
@@ -89,6 +97,7 @@ public class SecurityConfig {
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+                   
     }
 
     @Bean
