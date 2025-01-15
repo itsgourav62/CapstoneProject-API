@@ -1,18 +1,13 @@
 package com.capstone.qwikpay.entities;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,14 +16,12 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "bill_details")
+@JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from serialization
 public class Bill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
-    @Column(name = "user_id")
-    private Integer userId;
+    private Integer billId;
 
     private Integer amount;
 
@@ -39,14 +32,23 @@ public class Bill {
     private String description;
 
     @Column(name = "due_date")
+    @JsonProperty("due_date") // Rename for JSON output
     private LocalDateTime dueDate;
 
-    @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
-
     @Column(name = "created_at", updatable = false)
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "User_id")
+    @JsonIgnore // Prevent serialization of user
+    private UserEntity user;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore // Prevent serialization of payment if not needed
+    private Payment payment;
 }

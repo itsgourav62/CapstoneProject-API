@@ -1,39 +1,34 @@
-/*
- * package com.capstone.qwikpay.entities;
- * 
- * import java.time.LocalDateTime;
- * 
- * import jakarta.persistence.Entity; import jakarta.persistence.GeneratedValue;
- * import jakarta.persistence.GenerationType; import jakarta.persistence.Id;
- * import jakarta.persistence.Table; import lombok.AllArgsConstructor; import
- * lombok.Getter; import lombok.NoArgsConstructor; import lombok.Setter; import
- * lombok.ToString;
- * 
- * // Retrieve all the details and any payment references randomly generated //
- * Validation // TimeStamp
- * 
- * 
- * @AllArgsConstructor
- * 
- * @NoArgsConstructor
- * 
- * @Setter
- * 
- * @Getter
- * 
- * @ToString
- * 
- * @Entity
- * 
- * @Table(name="transaction_details") public class Transaction {
- * 
- * @Id
- * 
- * @GeneratedValue(strategy = GenerationType.AUTO) private Integer Id; private
- * Integer PaymentId; private LocalDateTime TimeStamp; private String Status;
- * 
- * 
- * 
- * 
- * }
- */
+package com.capstone.qwikpay.entities;
+
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
+@Table(name = "transaction_details")
+@JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields
+public class Transaction {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer transId;
+
+    private LocalDateTime transTime;
+
+    private String status;
+    
+    @Transient
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    @JsonIgnore // Prevent serialization of the payment relationship
+    private Payment payment;
+}

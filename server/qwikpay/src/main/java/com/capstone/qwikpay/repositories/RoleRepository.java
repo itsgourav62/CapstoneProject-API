@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.capstone.qwikpay.entities.ERole;
 import com.capstone.qwikpay.entities.Role;
+import com.capstone.qwikpay.enums.ERole;
 
 
 @Repository
