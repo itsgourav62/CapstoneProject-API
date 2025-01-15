@@ -26,14 +26,14 @@ public class BillController {
     private BillService billService;
 
     // Create new bill
-    @PostMapping
+    @PostMapping("/new")
     public ResponseEntity<Bill> createBill(@RequestBody Bill bill) {
         Bill createdBill = billService.createBill(bill);
         return ResponseEntity.ok(createdBill);
     }
 
     // Get all bills
-    @GetMapping
+    @GetMapping("/retrievAll")
     public ResponseEntity<List<Bill>> getAllBills() {
         List<Bill> bills = billService.getAllBills();
         return ResponseEntity.ok(bills);
@@ -47,28 +47,28 @@ public class BillController {
     }
 
     // Get bill by billId
-    @GetMapping("/{billId}")
+    @GetMapping("retrieveBillById/{billId}")
     public ResponseEntity<Bill> getBillByBillId(@PathVariable Integer billId) {
         Bill bill = billService.getBillById(billId);
         return ResponseEntity.ok(bill);
     }
 
     // Get bills by status
-    @GetMapping("/status/{status}")
+    @GetMapping("/{status}")
     public ResponseEntity<List<Bill>> getBillsByStatus(@PathVariable String status) {
         List<Bill> bills = billService.getBillsByStatus(status);
         return ResponseEntity.ok(bills);
     }
 
     // Update bill by billId
-    @PutMapping("/{billId}")
+    @PutMapping("update/{billId}")
     public ResponseEntity<Bill> updateBillById(@PathVariable Integer billId, @RequestBody Bill updatedBill) {
         Bill bill = billService.updateBillById(billId, updatedBill);
         return ResponseEntity.ok(bill);
     }
 
     // Delete bill by billId
-    @DeleteMapping("/{billId}")
+    @DeleteMapping("delete/{billId}")
     public ResponseEntity<Void> deleteBillById(@PathVariable Integer billId) {
         billService.deleteBillById(billId);
         return ResponseEntity.noContent().build();

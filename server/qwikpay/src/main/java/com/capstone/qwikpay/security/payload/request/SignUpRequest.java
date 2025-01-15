@@ -25,7 +25,7 @@ public class SignUpRequest {
 	private String password;
 
     @NotBlank
-    @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be 10 digits")
+    //@Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be 10 digits")
     private String mobile;
 
 	@NotBlank
