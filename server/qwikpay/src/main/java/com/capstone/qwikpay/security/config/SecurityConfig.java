@@ -23,13 +23,7 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-
-    public final static String[] PUBLIC_REQUEST_MATCHERS = { 
-        "/api/auth/**", 
-        "/swagger-ui/**", 
-        "/v3/api-docs/**", 
-        "/h2-console/**" // Allow access to H2 Console 
-    };
+    public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" };
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -54,18 +48,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      
-            // Allow requests to H2 console and public endpoints
-            // Authorize requests
         http
+            // Authorize requests
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
                 .requestMatchers("/api/user/delete/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/update/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/new/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/get/**").permitAll()
                 .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
-                 // Bill API access control
+                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
+
+                // Bill API access control
                 .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
@@ -80,24 +73,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
             )
-            
-            
-            // Disable CSRF for H2 console and APIs
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
-            
-            // Allow frames for H2 console
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-            
-            // Configure exception handling and session management
+            // Disable CSRF for simplicity (not recommended for production)
+            .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
-            // Configure authentication provider and add JWT filter
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-                   
     }
 
     @Bean
