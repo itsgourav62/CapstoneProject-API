@@ -61,7 +61,7 @@ public class UserController {
 		return service.deleteUser(userId);
 	}
 	
-	
+	// committed the code
 	//Get all users 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
