@@ -68,7 +68,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
 
                 // Payment API access control
-                .requestMatchers("/api/payments/process/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")

@@ -44,7 +44,7 @@ public class Bill {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "User_id")
     @JsonIgnore // Prevent serialization of user
     private UserEntity user;
 

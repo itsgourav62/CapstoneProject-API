@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ public class PaymentController {
 
     // Process a new payment
     @PostMapping("/process")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> processPayment(@RequestBody Payment payment) {
         paymentService.processPayment(payment);
         return ResponseEntity.ok("Payment processed successfully.");

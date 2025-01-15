@@ -25,7 +25,8 @@ public class Transaction {
     private LocalDateTime transTime;
 
     private String status;
-
+    
+    @Transient
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false)
     @JsonIgnore // Prevent serialization of the payment relationship
