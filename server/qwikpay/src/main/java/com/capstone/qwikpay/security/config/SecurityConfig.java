@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,78 +20,71 @@ import com.capstone.qwikpay.services.UserDetailsServiceImpl;
 @Configuration
 public class SecurityConfig {
 
-	@Autowired
-	private UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
-	@Autowired
-	private AuthEntryPointJwt unauthorizedHandler;
+    public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" };
 
-	public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**",
-			"/h2-console/**" // Allow access to H2 Console
-	};
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
-	@Bean
-	public AuthTokenFilter authenticationJwtTokenFilter() {
-		return new AuthTokenFilter();
-	}
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
-		return authProvider;
-	}
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				// Authorize requests
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/user/delete/**").hasRole("ADMIN")
-						.requestMatchers("/api/user/update/**").hasRole("ADMIN").requestMatchers("/api/user/new/**")
-						.hasRole("ADMIN").requestMatchers("/api/user/get/**").permitAll()
-						.requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
-						.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
-						// .anyRequest().authenticated()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // Authorize requests
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/user/delete/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/update/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/get/**").permitAll()
+                .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
 
-						// Bill API access control
-						.requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN") // All bill endpoints restricted
-																						// to authenticated users
-						.requestMatchers("/api/bills/user/**").hasRole("USER") // Bill access by user ID restricted to
-																				// ROLE_USER
-						.requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN") // Bill access by status
-																								// for both roles
-						.requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN") // Single bill retrieval allowed
-																						// for both roles
-						.requestMatchers("/api/bills").hasRole("ADMIN") // Only admins can create or modify bills
+                // Bill API access control
+                .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/user/{userId}").hasRole("ADMIN")
+                .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
 
-						// Payment API access control
-						.requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN") // Process a payment can
-																								// be done by both USER
-																								// and ADMIN
-						.requestMatchers("/api/payments/validate/**").hasAnyRole("USER", "ADMIN") // Validate payment by
-																									// ID
-						.requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN") // Retrieve payment by ID
-						.requestMatchers("/api/payments").hasRole("ADMIN") // Admin can view all payments
+                // Payment API access control
+                .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
+            )
+            // Disable CSRF for simplicity (not recommended for production)
+            .csrf(csrf -> csrf.disable())
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
-				).headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // Enable H2
-																										// Console
-																										// access
-				).exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
-		return http.build();
-	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

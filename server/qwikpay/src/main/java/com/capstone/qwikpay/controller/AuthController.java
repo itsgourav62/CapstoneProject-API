@@ -100,6 +100,10 @@ public class AuthController {
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
 		}
+		if (userRepository.existsByMobile(signUpRequest.getMobile())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Mobile number is already in use! try new one"));
+		}
+
 		// Create new user's account
 		UserEntity user = new UserEntity(signUpRequest.getUsername(), signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));

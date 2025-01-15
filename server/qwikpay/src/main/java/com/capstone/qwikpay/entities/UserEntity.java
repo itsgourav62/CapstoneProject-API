@@ -19,7 +19,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "user_details", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
-		@UniqueConstraint(columnNames = "email") })
+		@UniqueConstraint(columnNames = "email") ,@UniqueConstraint(columnNames = "mobile") ,})
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
