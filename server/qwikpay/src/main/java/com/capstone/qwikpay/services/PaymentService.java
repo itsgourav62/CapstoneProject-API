@@ -1,8 +1,9 @@
 package com.capstone.qwikpay.services;
 
-import com.capstone.qwikpay.entities.Payment;
-
 import java.util.List;
+
+import com.capstone.qwikpay.entities.Payment;
+import com.capstone.qwikpay.enums.EPaymentStatus;
 
 public interface PaymentService {
 
@@ -19,7 +20,7 @@ public interface PaymentService {
     List<Payment> getAllPayments();
 
     // Update an existing payment
-    Payment updatePayment(Integer paymentId, Payment updatedPayment);
+    Payment updatePayment(Integer paymentId,Payment updatedPayment);
 
     // Delete a payment by ID
     void deletePayment(Integer paymentId);
