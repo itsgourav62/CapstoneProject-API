@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capstone.qwikpay.entities.Payment;
+import com.capstone.qwikpay.exceptions.PaymentFailedException;
 import com.capstone.qwikpay.services.PaymentService;
 
 @RestController
@@ -29,14 +30,14 @@ public class PaymentController {
     // Process a new payment
     @PostMapping("/process")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> processPayment(@RequestBody Payment payment) {
+    public ResponseEntity<String> processPayment(@RequestBody Payment payment) throws PaymentFailedException {
         paymentService.processPayment(payment);
         return ResponseEntity.ok("Payment processed successfully.");
     }
 
     // Validate a payment by ID it is used to show that bill payment is completed or not
     @GetMapping("/status/{id}")
-    public ResponseEntity<Boolean> validatePayment(@PathVariable("id") int paymentId) {
+    public ResponseEntity<Boolean> validatePayment(@PathVariable("id") int paymentId) throws PaymentFailedException {
         boolean isValid = paymentService.validatePayment(paymentId);
         return ResponseEntity.ok(isValid);
     }
@@ -57,7 +58,7 @@ public class PaymentController {
 
     // Update a payment by ID
     @PutMapping("/{id}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable("id") int paymentId, @RequestBody Payment updatedPayment) {
+    public ResponseEntity<Payment> updatePayment(@PathVariable("id") int paymentId, @RequestBody Payment updatedPayment) throws PaymentFailedException {
         Payment payment = paymentService.updatePayment(paymentId, updatedPayment);
         return ResponseEntity.ok(payment);
     }
