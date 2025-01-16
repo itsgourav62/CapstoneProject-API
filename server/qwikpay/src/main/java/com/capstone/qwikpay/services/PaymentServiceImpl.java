@@ -52,7 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
             Payment existingPayment = paymentRepository.findById(paymentId)
                     .orElseThrow(() -> new PaymentFailedException("Payment not found for ID: " + paymentId));
 
-            existingPayment.setBillId(updatedPayment.getBillId());
+            //existingPayment.setBillId(updatedPayment.getBillId());
             existingPayment.setPaymentStatus(updatedPayment.getPaymentStatus());
             existingPayment.setPaymentDate(updatedPayment.getPaymentDate());
             return paymentRepository.save(existingPayment);

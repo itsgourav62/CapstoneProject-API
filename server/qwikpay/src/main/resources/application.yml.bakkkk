@@ -3,7 +3,7 @@ spring:
     name: qwikpay
 
   datasource:
-    url: jdbc:mysql://localhost:3306/qwikpaydb15?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/qwikpaydb?createDatabaseIfNotExist=true
     username: root
     password: root
 
