@@ -3,7 +3,7 @@ package com.capstone.qwikpay.entities;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.*;
@@ -35,7 +35,5 @@ public class Payment {
     @JsonBackReference // Prevent cyclic serialization between Bill and Payment
     private Bill bill;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnore // Prevent serialization of transaction by default
-    private Transaction transaction;
+ 
 }
