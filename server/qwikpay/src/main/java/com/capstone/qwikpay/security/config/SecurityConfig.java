@@ -70,9 +70,11 @@ public class SecurityConfig {
 
                 // Payment API access control
                 .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/update/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/payments/retrieveById/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/payments/retrieveAll").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/getStatusById").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/delete/{id}").hasAnyRole("ADMIN")
             )
             // Disable CSRF for simplicity (not recommended for production)
             .csrf(csrf -> csrf.disable())

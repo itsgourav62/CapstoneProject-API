@@ -36,35 +36,37 @@ public class PaymentController {
     }
 
     // Validate a payment by ID it is used to show that bill payment is completed or not
-    @GetMapping("/status/{id}")
+    @GetMapping("/getStatusById/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean> validatePayment(@PathVariable("id") int paymentId) throws PaymentFailedException {
         boolean isValid = paymentService.validatePayment(paymentId);
         return ResponseEntity.ok(isValid);
     }
 
     // Get a payment by ID
-    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("retrieveById/{id}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable("id") int paymentId) {
         Payment payment = paymentService.getPaymentById(paymentId);
         return ResponseEntity.ok(payment);
     }
 
     // Get all payments
-    @GetMapping
+    @GetMapping("/retrieveAll")
     public ResponseEntity<List<Payment>> getAllPayments() {
         List<Payment> payments = paymentService.getAllPayments();
         return ResponseEntity.ok(payments);
     }
 
     // Update a payment by ID
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<Payment> updatePayment(@PathVariable("id") int paymentId, @RequestBody Payment updatedPayment) throws PaymentFailedException {
         Payment payment = paymentService.updatePayment(paymentId, updatedPayment);
         return ResponseEntity.ok(payment);
     }
 
     // Delete a payment by ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deletePayment(@PathVariable("id") int paymentId) {
         paymentService.deletePayment(paymentId);
         return ResponseEntity.ok("Payment deleted successfully.");
