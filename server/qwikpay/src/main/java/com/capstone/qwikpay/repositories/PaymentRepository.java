@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface PaymentRepository extends CrudRepository<Payment, Integer> {
 
-    List<Payment> findByBillId(Integer billId);
+    //List<Payment> findByBillId(Integer billId);
 
     List<Payment> findByPaymentStatus(String paymentStatus);
 }

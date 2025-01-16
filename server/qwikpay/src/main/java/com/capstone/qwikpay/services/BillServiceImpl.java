@@ -1,6 +1,5 @@
 package com.capstone.qwikpay.services;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +10,8 @@ import com.capstone.qwikpay.entities.Bill;
 import com.capstone.qwikpay.exceptions.BillNotFoundException;
 import com.capstone.qwikpay.repositories.BillRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class BillServiceImpl implements BillService {
 
@@ -19,8 +20,9 @@ public class BillServiceImpl implements BillService {
 
     // Create new bill
     @Override
+    @Transactional
     public Bill createBill(Bill bill) {
-        bill.setCreatedAt(LocalDateTime.now());
+        bill.setCreatedAt(java.time.LocalDateTime.now());
         return billRepository.save(bill);
     }
 
