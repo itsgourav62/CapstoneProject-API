@@ -3,7 +3,7 @@ package com.capstone.qwikpay.entities;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-//import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.*;
@@ -23,17 +23,12 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer pmtId;
 
-    private Integer billId;
-
+    
     @Column(name = "payment_status", length = 50, nullable = false)
     private String paymentStatus;
 
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
-    @OneToOne(mappedBy = "payment")
-    @JsonBackReference // Prevent cyclic serialization between Bill and Payment
-    private Bill bill;
-
- 
+	    
 }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capstone.qwikpay.entities.UserEntity;
-import com.capstone.qwikpay.exceptions.UserNotFoundException;
 import com.capstone.qwikpay.services.UserService;
 
 
@@ -43,25 +42,25 @@ public class UserController {
 	//Get user by Id
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get/{id}")
-	public UserEntity getUser(@PathVariable("id")Integer userId) throws UserNotFoundException {
+	public UserEntity getUser(@PathVariable("id")Integer userId) {
 		return service.getUser(userId);
 	}
 	
 	//Update user by Id
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/update")
-	public UserEntity updateUser(@RequestBody UserEntity user) throws UserNotFoundException {
+	public UserEntity updateUser(@RequestBody UserEntity user) {
 		return service.updateUser(user);
 	}
 	
 	//Delete user by id
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/delete/{id}")
-	public String deleteUser(@PathVariable("id") Integer userId) throws UserNotFoundException {
+	public String deleteUser(@PathVariable("id") Integer userId) {
 		return service.deleteUser(userId);
 	}
 	
-	// committed the code
+	
 	//Get all users 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
@@ -70,4 +69,3 @@ public class UserController {
 	}
 	
 }
-

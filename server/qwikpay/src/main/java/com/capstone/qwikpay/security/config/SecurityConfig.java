@@ -61,6 +61,7 @@ public class SecurityConfig {
                 // Bill API access control
                 .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
+//                .requestMatchers("/api/bills/new/**").permitAll() //TODO change the persmission after fixing the issue 
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/user/{userId}").hasRole("ADMIN")
@@ -82,7 +83,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
