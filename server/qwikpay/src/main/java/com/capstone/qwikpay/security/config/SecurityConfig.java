@@ -23,12 +23,7 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    public final static String[] PUBLIC_REQUEST_MATCHERS = { 
-        "/api/auth/**", 
-        "/swagger-ui/**", 
-        "/v3/api-docs/**", 
-        "/h2-console/**" // Allow access to H2 Console 
-    };
+    public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" };
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -54,37 +49,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Allow requests to H2 console and public endpoints
+            // Authorize requests
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
                 .requestMatchers("/api/user/delete/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/update/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/new/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/get/**").permitAll()
                 .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/user/**").hasRole("USER")
-                .requestMatchers("/api/bills/status/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/{id}").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills").hasRole("ADMIN")
+                .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
+
+                // Bill API access control
+                .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/bills/user/{userId}").hasRole("ADMIN")
+                .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
+
+                // Payment API access control
                 .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
             )
-            
-            // Disable CSRF for H2 console and APIs
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
-            
-            // Allow frames for H2 console
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-            
-            // Configure exception handling and session management
+            // Disable CSRF for simplicity (not recommended for production)
+            .csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
-            // Configure authentication provider and add JWT filter
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
