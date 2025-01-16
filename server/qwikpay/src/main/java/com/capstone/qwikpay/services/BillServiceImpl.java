@@ -37,7 +37,7 @@ public class BillServiceImpl implements BillService {
 
     // Retrieve bill by Bill ID
     @Override
-    public Bill getBillById(Integer billId) {
+    public Bill getBillById(Integer billId) throws BillNotFoundException {
         Optional<Bill> bill = billRepository.findById(billId);
         return bill.orElseThrow(() -> new BillNotFoundException("Bill not found with id: " + billId));
     }
@@ -50,7 +50,7 @@ public class BillServiceImpl implements BillService {
 
     // Update bill by its ID
     @Override
-    public Bill updateBillById(Integer billId, Bill updatedBill) {
+    public Bill updateBillById(Integer billId, Bill updatedBill) throws BillNotFoundException {
         Bill bill = getBillById(billId);
 //        bill.setUserId(updatedBill.getUserId());
         bill.setAmount(updatedBill.getAmount());
@@ -64,7 +64,7 @@ public class BillServiceImpl implements BillService {
 
     // Delete bill by its ID
     @Override
-    public void deleteBillById(Integer billId) {
+    public void deleteBillById(Integer billId) throws BillNotFoundException {
         Bill bill = getBillById(billId);
         billRepository.delete(bill);
     }

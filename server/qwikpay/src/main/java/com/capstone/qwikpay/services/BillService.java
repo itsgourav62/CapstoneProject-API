@@ -1,6 +1,7 @@
 package com.capstone.qwikpay.services;
 
 import com.capstone.qwikpay.entities.Bill;
+import com.capstone.qwikpay.exceptions.BillNotFoundException;
 
 import java.util.List;
 
@@ -16,14 +17,14 @@ public interface BillService {
     List<Bill> getBillsByUserId(Integer userId);
 
     // Retrieve bill by Bill ID
-    Bill getBillById(Integer billId);
+    Bill getBillById(Integer billId)  throws BillNotFoundException;
 
     // Retrieve bills by Status
     List<Bill> getBillsByStatus(String status);
 
     // Update bill by its ID
-    Bill updateBillById(Integer billId, Bill updatedBill);
+    Bill updateBillById(Integer billId, Bill updatedBill)  throws BillNotFoundException;
 
     // Delete bill by its ID
-    void deleteBillById(Integer billId);
+    void deleteBillById(Integer billId) throws BillNotFoundException;
 }
