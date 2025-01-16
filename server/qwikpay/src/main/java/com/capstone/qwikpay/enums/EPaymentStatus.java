@@ -1,7 +1,7 @@
 package com.capstone.qwikpay.enums;
 
 public enum EPaymentStatus {
-	PENDING,
+    PENDING,
     PAID,
     FAILED
 }
