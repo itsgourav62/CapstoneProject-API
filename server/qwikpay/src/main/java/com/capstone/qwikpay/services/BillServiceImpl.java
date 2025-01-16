@@ -1,5 +1,6 @@
 package com.capstone.qwikpay.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class BillServiceImpl implements BillService {
     // Create new bill
     @Override
     public Bill createBill(Bill bill) {
-        bill.setCreatedAt(java.time.LocalDateTime.now());
+        bill.setCreatedAt(LocalDateTime.now());
         return billRepository.save(bill);
     }
 
