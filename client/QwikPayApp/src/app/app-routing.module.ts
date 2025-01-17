@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
+import { HomeComponent } from './users/home/home.component';
 import { HomeComponent } from './users/home/home.component';
 import { SigninComponent } from './users/signin/signin.component';
 import { SignupComponent } from './users/signup/signup.component';
@@ -13,9 +13,6 @@ const routes: Routes = [
   { path: 'forgotpassword', component: ForgotPasswordComponent }
 
 ];
-
-
-const routes: Routes = [];
 
 
 @NgModule({
