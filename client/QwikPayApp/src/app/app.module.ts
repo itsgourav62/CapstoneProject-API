@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from "./app.component";
 import { FooterComponent } from "./shared/footer/footer.component";
 import { HeaderComponent } from "./shared/header/header.component";
@@ -9,6 +9,7 @@ import { ForgotPasswordComponent } from "./users/forgotpassword/forgotpassword.c
 import { HomeComponent } from "./users/home/home.component";
 import { SigninComponent } from "./users/signin/signin.component";
 import { SignupComponent } from "./users/signup/signup.component";
+import { PaymentComponent } from './payment/payment.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { SignupComponent } from "./users/signup/signup.component";
     SignupComponent,
     FooterComponent,
     ForgotPasswordComponent,
-    HeaderComponent
+    HeaderComponent,
+    PaymentComponent
 
   ],
   imports: [
