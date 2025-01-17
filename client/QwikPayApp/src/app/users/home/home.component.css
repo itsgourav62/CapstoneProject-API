@@ -1,0 +1,41 @@
+.hero {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)); /* Initial matte black gradient */
+    background-size: 400% 400%; /* Enlarged for smooth animation */
+    color: white;
+    padding: 5rem 0;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: gradientAnimation 6s ease-in-out infinite, shineEffect 6s ease-in-out infinite;
+  }
+  
+  @keyframes gradientAnimation {
+    0% {
+      background-position: 0% 0%; /* Start at the top-left */
+    }
+    50% {
+      background-position: 100% 100%; /* Move to the bottom-right */
+    }
+    100% {
+      background-position: 0% 0%; /* Return to the top-left */
+    }
+  }
+  
+  @keyframes shineEffect {
+    0% {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)); /* Initial matte black */
+    }
+    25% {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(192, 192, 192, 0.15)); /* Light shine starts */
+    }
+    50% {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(192, 192, 192, 0.25)); /* Stronger shine at center */
+    }
+    75% {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(192, 192, 192, 0.15)); /* Shine starts fading */
+    }
+    100% {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)); /* Fade back to matte black */
+    }
+  }
+  
