@@ -60,7 +60,7 @@ public class SecurityConfig {
 
                 // Bill API access control
                 .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
-                .requestMatchers("/api/bills/new/**").hasRole("ADMIN")
+                .requestMatchers("/api/bills/new/**").permitAll()
 //                .requestMatchers("/api/bills/new/**").permitAll() //TODO change the persmission after fixing the issue 
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
@@ -70,9 +70,11 @@ public class SecurityConfig {
 
                 // Payment API access control
                 .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments/status/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments/{id}").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/payments").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/update/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/payments/retrieveById/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/payments/retrieveAll").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/getStatusById").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/delete/{id}").hasAnyRole("ADMIN")
             )
             // Disable CSRF for simplicity (not recommended for production)
             .csrf(csrf -> csrf.disable())
