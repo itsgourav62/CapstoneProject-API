@@ -56,6 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/user/new/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/get/**").permitAll()
                 .requestMatchers("/api/user/users").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/auth/forgot-password").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
 
                 // Bill API access control
