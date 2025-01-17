@@ -3,7 +3,6 @@ package com.capstone.qwikpay.services;
 import java.util.List;
 
 import com.capstone.qwikpay.entities.Payment;
-import com.capstone.qwikpay.enums.EPaymentStatus;
 import com.capstone.qwikpay.exceptions.PaymentFailedException;
 
 public interface PaymentService {
@@ -16,12 +15,15 @@ public interface PaymentService {
 
     // Retrieve a payment by ID
     Payment getPaymentById(Integer paymentId);
+    
+    //Retrieve payments by user Id
+    List<Payment> getPaymentsByUserId(int userId);
 
     // Retrieve all payments
     List<Payment> getAllPayments();
 
     // Update an existing payment
-    Payment updatePayment(Integer paymentId,Payment updatedPayment) throws PaymentFailedException;
+    Payment updatePayment(Integer paymentId, Payment updatedPayment) throws PaymentFailedException;
 
     // Delete a payment by ID
     void deletePayment(Integer paymentId);
