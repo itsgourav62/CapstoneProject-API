@@ -1,1 +1,161 @@
-<p>signup works!</p>
+<div class="signup-container d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div 
+      class="signup-box p-4 border rounded shadow-lg bg-white w-100" 
+      style="max-width: 450px; box-sizing: border-box;"
+    >
+      <h2 class="text-center text-primary mb-4">Create an Account</h2>
+      <p class="text-center mb-4 text-muted">Sign up to start making secure payments.</p>
+      <p class="text-center mb-4 text-success">We're excited to have you join us!</p>
+  
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <!-- Username -->
+        <div class="form-group mb-3">
+          <label for="username" class="form-label">Username:</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            class="form-control"
+            placeholder="Enter your username"
+            [ngClass]="{
+              'is-invalid': signupForm.get('username')?.invalid && signupForm.get('username')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched">
+            Username is required.
+          </div>
+        </div>
+  
+        <!-- Email -->
+        <div class="form-group mb-3">
+          <label for="email" class="form-label">Email:</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            placeholder="Enter your email"
+            [ngClass]="{
+              'is-invalid': signupForm.get('email')?.invalid && signupForm.get('email')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+            A valid email is required.
+          </div>
+        </div>
+  
+        <!-- Password -->
+        <div class="form-group mb-3">
+          <label for="password" class="form-label">Password:</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-control"
+            placeholder="Enter your password"
+            [ngClass]="{
+              'is-invalid': signupForm.get('password')?.invalid && signupForm.get('password')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+            Password is required and must be at least 6 characters long.
+          </div>
+        </div>
+  
+        <!-- Confirm Password -->
+        <div class="form-group mb-3">
+          <label for="confirmPassword" class="form-label">Confirm Password:</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            class="form-control"
+            placeholder="Confirm your password"
+            [ngClass]="{
+              'is-invalid': signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched">
+            Password confirmation is required and must match the password.
+          </div>
+        </div>
+  
+        <!-- Mobile -->
+        <div class="form-group mb-3">
+          <label for="mobile" class="form-label">Mobile:</label>
+          <input
+            id="mobile"
+            type="text"
+            formControlName="mobile"
+            class="form-control"
+            placeholder="Enter your mobile number"
+            [ngClass]="{
+              'is-invalid': signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched
+            }"
+          />
+          <div class="invalid-feedback" *ngIf="signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched">
+            Mobile number is required.
+          </div>
+        </div>
+  
+        <!-- Address -->
+        <div class="form-group mb-3">
+          <label for="address" class="form-label">Address:</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-control"
+            placeholder="Enter your address"
+            [ngClass]="{
+              'is-invalid': signupForm.get('address')?.invalid && signupForm.get('address')?.touched
+            }"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="signupForm.get('address')?.invalid && signupForm.get('address')?.touched">
+            Address is required.
+          </div>
+        </div>
+  
+        <!-- Gender -->
+        <div class="form-group mb-3">
+          <label for="gender" class="form-label">Gender:</label>
+          <select
+            id="gender"
+            formControlName="gender"
+            class="form-select"
+            [ngClass]="{
+              'is-invalid': signupForm.get('gender')?.invalid && signupForm.get('gender')?.touched
+            }"
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="signupForm.get('gender')?.invalid && signupForm.get('gender')?.touched">
+            Gender is required.
+          </div>
+        </div>
+  
+        <!-- Error Message -->
+        <div class="error-message text-center text-danger mb-4" *ngIf="errorMessage">
+          <strong>{{ errorMessage }}</strong>
+        </div>
+  
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100" [disabled]="signupForm.invalid">Sign Up</button>
+      </form>
+  
+      <!-- Signin and Forgot Password Links -->
+      <div class="text-center mt-3">
+        <p class="text-muted">
+          Already have an account?
+          <a routerLink="/signin" class="text-decoration-none text-primary">Sign in here</a>
+        </p>
+        <p class="text-muted">
+          Forgot your password?
+          <a routerLink="/forgotpassword" class="text-decoration-none text-primary">Reset it here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  
