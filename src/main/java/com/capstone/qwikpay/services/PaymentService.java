@@ -18,6 +18,8 @@ public interface PaymentService {
     
     //Retrieve payments by user Id
     List<Payment> getPaymentsByUserId(int userId);
+    
+    List<Payment> getPaymentByStatus(String paymentStatus);
 
     // Retrieve all payments
     List<Payment> getAllPayments();

@@ -10,6 +10,8 @@ import com.capstone.qwikpay.entities.UserEntity;
 @Repository
 public interface UserRepository extends CrudRepository<UserEntity, Integer> {
 	public Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByEmail(String email);
+
 
 	public Boolean existsByUsername(String username);
 
