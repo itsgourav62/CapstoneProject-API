@@ -2,6 +2,7 @@ package com.capstone.qwikpay.controller;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -160,4 +161,27 @@ public class AuthController {
 		}
 		return roles;
 	}
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> passwordDetails) {
+	    String email = passwordDetails.get("email");
+	    String newPassword = passwordDetails.get("password");
+	    String confirmPassword = passwordDetails.get("confirmPassword");
+
+	    // Check if the email exists in the database
+	    UserEntity user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new RuntimeException("Error: User not found with email: " + email));
+
+	    // Check if password and confirmPassword match
+	    if (!newPassword.equals(confirmPassword)) {
+	        return ResponseEntity.badRequest().body(new MessageResponse("Error: Password and Confirm Password do not match!"));
+	    }
+
+	    // Update the user's password
+	    user.setPassword(encoder.encode(newPassword));
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
+	}
+
 }

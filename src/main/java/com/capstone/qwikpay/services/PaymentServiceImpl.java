@@ -44,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentDate(LocalDateTime.now());
 
         // Update the bill status based on payment status
-        if ("Completed".equals(payment.getPaymentStatus())) {
+        if ("Paid".equals(payment.getPaymentStatus())) {
             bill.setBillStatus("Paid");
         } else {
             bill.setBillStatus("Pending");
@@ -139,6 +139,16 @@ public class PaymentServiceImpl implements PaymentService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
+	@Override
+    public List<Payment> getPaymentByStatus(String paymentStatus) {
+        if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
+            throw new IllegalArgumentException("Payment status cannot be null or empty");
+        }
+        return paymentRepository.findByPaymentStatus(paymentStatus);
+    }
 
 
 

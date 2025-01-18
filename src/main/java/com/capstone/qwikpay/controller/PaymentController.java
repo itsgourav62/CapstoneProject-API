@@ -1,5 +1,6 @@
 package com.capstone.qwikpay.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class PaymentController {
 
     // Process a new payment
     @PostMapping("/process")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Payment> processPayment(@RequestBody Payment payment) throws PaymentFailedException {
         if (payment.getBillId() == null) {
             throw new PaymentFailedException("Bill ID must not be null");
@@ -52,16 +53,27 @@ public class PaymentController {
         return new ResponseEntity<>(processedPayment, HttpStatus.CREATED);
     }
 
-    // Validate a payment by ID it is used to show that bill payment is completed or not
-    @GetMapping("/getPaymentsByUserId/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Payment>> getPaymentsByUserId(@PathVariable("userId") int userId) {
-        List<Payment> payments = paymentService.getPaymentsByUserId(userId);
+    
+    //Retrieve the payment details by the status
+    
+    @GetMapping("/retrieveByStatus/{status}")
+    public ResponseEntity<?> getPaymentByStatus(@PathVariable("status") String status) {
+        List<Payment> payments = paymentService.getPaymentByStatus(status);
+        
+        // Check if the result is empty
+        if (payments == null || payments.isEmpty()) {
+            // Return a custom message with HTTP 404 status
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No payments found with status: " + status);
+        }
+        
         return ResponseEntity.ok(payments);
     }
 
+    
+
     // Get a payment by ID
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("retrieveById/{id}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable("id") int paymentId) {
         Payment payment = paymentService.getPaymentById(paymentId);
