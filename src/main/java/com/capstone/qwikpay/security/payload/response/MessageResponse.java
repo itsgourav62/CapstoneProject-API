@@ -1,7 +1,8 @@
 package com.capstone.qwikpay.security.payload.response;
 
+import lombok.Generated;
 
-
+@Generated
 public class MessageResponse {
 	private String message;
 

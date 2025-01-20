@@ -1,5 +1,7 @@
 package com.capstone.qwikpay.exceptions;
+import lombok.Generated;
 
+@Generated
 public class PaymentFailedException extends Exception {
 
     private static final long serialVersionUID = 1L;

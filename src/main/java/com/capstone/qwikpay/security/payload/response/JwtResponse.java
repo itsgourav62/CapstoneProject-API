@@ -1,7 +1,9 @@
 package com.capstone.qwikpay.security.payload.response;
 
 import java.util.List;
+import lombok.Generated;
 
+@Generated
 
 public class JwtResponse {
 	private String accessToken;
