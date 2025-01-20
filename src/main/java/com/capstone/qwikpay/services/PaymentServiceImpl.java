@@ -13,9 +13,13 @@ import com.capstone.qwikpay.repositories.BillRepository;
 import com.capstone.qwikpay.repositories.PaymentRepository;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -23,25 +27,30 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private BillRepository billRepository;
 
-   
     @Transactional
     @Override
-    public Payment processPayment(Payment payment) {
-        // Ensure Bill is not null
+    public Payment processPayment(Payment payment) throws PaymentFailedException {
+        logger.info("Processing payment for Bill ID: {}", payment.getBillId());
+
+        // Ensure bill_id is provided
         if (payment.getBill() == null || payment.getBill().getBillId() == null) {
-            throw new RuntimeException("Bill information is missing or Bill ID is null for the payment.");
+            logger.error("Bill information is missing or Bill ID is null for the payment.");
+            throw new PaymentFailedException("Bill information is missing or Bill ID is null for the payment.");
         }
 
         // Fetch the Bill using the provided Bill ID
         Bill bill = billRepository.findById(payment.getBill().getBillId())
-                .orElseThrow(() -> new RuntimeException("Bill not found with ID: " + payment.getBill().getBillId()));
+                .orElseThrow(() -> {
+                    logger.error("Bill not found with ID: {}", payment.getBill().getBillId());
+                    return new PaymentFailedException("Bill not found with ID: " + payment.getBill().getBillId());
+                });
 
         // Associate the Bill with the Payment
         payment.setBill(bill);
 
         // Update payment status
         payment.setPaymentStatus("Paid");
-        payment.setPaymentDate(java.time.LocalDateTime.now());
+        payment.setPaymentDate(LocalDateTime.now());
 
         // Update the bill status based on payment status
         if ("Paid".equals(payment.getPaymentStatus())) {
@@ -50,45 +59,63 @@ public class PaymentServiceImpl implements PaymentService {
             bill.setBillStatus("Pending");
         }
 
-        // Save the updated payment
+        // Save the updated bill and payment
         Payment savedPayment = paymentRepository.save(payment);
-
-        // Ensure that the pmt_id is updated in the bill_details table
         bill.setPayment(savedPayment);
         billRepository.save(bill);
-
+        
+        logger.info("Payment processed successfully with Payment ID: {}", savedPayment.getPmtId());
         return savedPayment;
     }
 
-
-
     @Override
     public boolean validatePayment(Integer paymentId) throws PaymentFailedException {
+        logger.info("Validating payment with Payment ID: {}", paymentId);
         return paymentRepository.findById(paymentId)
-                .map(payment -> "PAID".equalsIgnoreCase(payment.getPaymentStatus()))
-                .orElseThrow(() -> new PaymentFailedException("Payment not found for ID: " + paymentId));
+                .map(payment -> {
+                    boolean isValid = "PAID".equalsIgnoreCase(payment.getPaymentStatus());
+                    logger.info("Payment validation result for Payment ID {}: {}", paymentId, isValid);
+                    return isValid;
+                })
+                .orElseThrow(() -> {
+                    logger.error("Payment not found for ID: {}", paymentId);
+                    return new PaymentFailedException("Payment not found for ID: " + paymentId);
+                });
     }
 
     @Override
     public Payment getPaymentById(Integer paymentId) {
+        logger.info("Fetching payment with Payment ID: {}", paymentId);
         return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found for ID: " + paymentId));
+                .orElseThrow(() -> {
+                    logger.error("Payment not found for ID: {}", paymentId);
+                    return new RuntimeException("Payment not found for ID: " + paymentId);
+                });
     }
 
     @Override
     public List<Payment> getAllPayments() {
-        return (List<Payment>) paymentRepository.findAll();
+        logger.info("Fetching all payments");
+        List<Payment> payments = (List<Payment>) paymentRepository.findAll();
+        logger.info("Total number of payments retrieved: {}", payments.size());
+        return payments;
     }
 
     @Override
     @Transactional
     public Payment updatePayment(Integer paymentId, Payment updatedPayment) throws PaymentFailedException {
+        logger.info("Updating payment with Payment ID: {} and new details: {}", paymentId, updatedPayment);
+
         // Retrieve the existing payment
         Payment existingPayment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found for ID: " + paymentId));
+                .orElseThrow(() -> {
+                    logger.error("Payment not found for ID: {}", paymentId);
+                    return new RuntimeException("Payment not found for ID: " + paymentId);
+                });
 
         // Check if the payment is already completed and prevent modification
         if ("COMPLETED".equalsIgnoreCase(existingPayment.getPaymentStatus())) {
+            logger.error("Cannot update a completed payment with Payment ID: {}", paymentId);
             throw new PaymentFailedException("Cannot update a completed payment.");
         }
 
@@ -110,24 +137,30 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // Save the updated payment
-        return paymentRepository.save(existingPayment);
+        Payment savedPayment = paymentRepository.save(existingPayment);
+        logger.info("Payment updated successfully with Payment ID: {}", savedPayment.getPmtId());
+        return savedPayment;
     }
-
-
 
     @Override
     public void deletePayment(Integer paymentId) {
+        logger.info("Deleting payment with Payment ID: {}", paymentId);
         Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found for ID: " + paymentId));
+                .orElseThrow(() -> {
+                    logger.error("Payment not found for ID: {}", paymentId);
+                    return new RuntimeException("Payment not found for ID: " + paymentId);
+                });
 
         Bill bill = payment.getBill();
         if (bill != null) {
             bill.setPayment(null);
             bill.setBillStatus("Unpaid");
             billRepository.save(bill);
+            logger.info("Associated bill for Payment ID: {} updated to 'Unpaid'", paymentId);
         }
 
         paymentRepository.deleteById(paymentId);
+        logger.info("Payment with Payment ID: {} deleted successfully", paymentId);
     }
 
     private void updateBillAfterPayment(Bill bill, Payment payment) {
@@ -137,21 +170,22 @@ public class PaymentServiceImpl implements PaymentService {
         billRepository.save(bill);
     }
 
-
-
-
-	@Override
+    @Override
     public List<Payment> getPaymentByStatus(String paymentStatus) {
         if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
+            logger.error("Payment status cannot be null or empty");
             throw new IllegalArgumentException("Payment status cannot be null or empty");
         }
-        return paymentRepository.findByPaymentStatus(paymentStatus);
+        logger.info("Fetching payments with status: {}", paymentStatus);
+        List<Payment> payments = paymentRepository.findByPaymentStatus(paymentStatus);
+        logger.info("Total payments retrieved with status '{}': {}", paymentStatus, payments.size());
+        return payments;
     }
 
-
-	// method to fetch payments by userId
     @Override
     public List<Payment> getPaymentsByUserId(int userId) {
+        // Assuming you have a user relationship with payments, fetch payments by userId
+        logger.info("Fetched payments with User ID: {}", userId);
         return paymentRepository.findPaymentsByUserId(userId);
     }
 }

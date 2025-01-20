@@ -104,7 +104,6 @@ public class PaymentControllerTest {
         assertEquals(payment, response.getBody());
     }
 
-
     @Test
     void testGetAllPayments() {
         List<Payment> payments = Arrays.asList(new Payment(), new Payment());
@@ -172,5 +171,3 @@ public class PaymentControllerTest {
         assertEquals("Delete failed", exception.getMessage());
     }
 }
-
-

@@ -22,7 +22,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from serialization
 public class Bill {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer billId;
 
@@ -37,7 +37,7 @@ public class Bill {
     private String description;
 
     @Column(name = "due_date")
-    @JsonProperty("due_date")
+    @JsonProperty("due_date") // Rename for JSON output
     private LocalDateTime dueDate;
 
     @Column(name = "created_at", updatable = false)

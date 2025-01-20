@@ -88,6 +88,4 @@ public class UserControllerTest {
         assertNotNull(response);
         assertEquals(users, response);
     }
-
-  }
-
+}

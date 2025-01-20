@@ -15,10 +15,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 import java.util.Arrays;
 import java.util.List;
-
 
 class BillControllerTest {
 
@@ -69,7 +67,6 @@ class BillControllerTest {
     }
 
     // 3. Test Update Bill by ID
-
     @Test
     void testUpdateBillById_Success() throws Exception {
         Bill mockBill = new Bill();
@@ -86,7 +83,6 @@ class BillControllerTest {
                 .andExpect(jsonPath("$.description").value("Updated bill"));
     }
 
-
     // 4. Test Delete Bill by ID
     @Test
     void testDeleteBill_Success() throws Exception {
@@ -94,7 +90,6 @@ class BillControllerTest {
 
         mockMvc.perform(delete("/api/bills/delete/1"))
                 .andExpect(status().isNoContent());
-
 
         verify(billService, times(1)).deleteBillById(1);
     }
@@ -154,6 +149,3 @@ class BillControllerTest {
     }
 
 }
-
-
-

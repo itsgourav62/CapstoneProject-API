@@ -1,7 +1,7 @@
 package com.capstone.qwikpay.enums;
 
 public enum EBillType {
-	ELECTRICITY,
+    ELECTRICITY,
     WATER,
     INTERNET,
     GAS,

@@ -22,82 +22,113 @@ import com.capstone.qwikpay.entities.Payment;
 import com.capstone.qwikpay.exceptions.PaymentFailedException;
 import com.capstone.qwikpay.repositories.BillRepository;
 import com.capstone.qwikpay.services.PaymentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/payments")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin("*")
 public class PaymentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     @Autowired
     private PaymentService paymentService;
     
-    @Autowired BillRepository billRepository;
+    @Autowired
+    private BillRepository billRepository;
 
     // Process a new payment
     @PostMapping("/process")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Payment> processPayment(@RequestBody Payment payment) throws PaymentFailedException {
+        logger.info("Processing payment request for billId: {}", payment.getBillId());
+
         if (payment.getBillId() == null) {
+            logger.error("Bill ID must not be null for the payment request");
             throw new PaymentFailedException("Bill ID must not be null");
         }
 
         // Manually set the bill using the bill_id
         Bill bill = billRepository.findById(payment.getBillId())
-                .orElseThrow(() -> new PaymentFailedException("Bill not found with ID: " + payment.getBillId()));
+                .orElseThrow(() -> {
+                    logger.error("Bill not found with ID: {}", payment.getBillId());
+                    return new PaymentFailedException("Bill not found with ID: " + payment.getBillId());
+                });
 
-        // Set the Bill object in the Payment entity manually
         payment.setBill(bill);
 
         // Process the payment
         Payment processedPayment = paymentService.processPayment(payment);
+        logger.info("Payment processed successfully for billId: {}", payment.getBillId());
+
         return new ResponseEntity<>(processedPayment, HttpStatus.CREATED);
     }
 
-    
-    //Retrieve the payment details by the status
-    
+    // Retrieve the payment details by the status
     @GetMapping("/retrieveByStatus/{status}")
     public ResponseEntity<?> getPaymentByStatus(@PathVariable("status") String status) {
-        List<Payment> payments = paymentService.getPaymentByStatus(status);
+        logger.info("Retrieving payments with status: {}", status);
         
-        // Check if the result is empty
+        List<Payment> payments = paymentService.getPaymentByStatus(status);
+
         if (payments == null || payments.isEmpty()) {
-            // Return a custom message with HTTP 404 status
+            logger.warn("No payments found with status: {}", status);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No payments found with status: " + status);
         }
-        
+
+        logger.info("Retrieved {} payments with status: {}", payments.size(), status);
         return ResponseEntity.ok(payments);
     }
-
-    
 
     // Get a payment by ID
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("retrieveById/{id}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable("id") int paymentId) {
+        logger.info("Retrieving payment with ID: {}", paymentId);
+        
         Payment payment = paymentService.getPaymentById(paymentId);
+
+        if (payment != null) {
+            logger.info("Retrieved payment: {}", payment);
+        } else {
+            logger.warn("No payment found with ID: {}", paymentId);
+        }
+
         return ResponseEntity.ok(payment);
     }
 
     // Get all payments
     @GetMapping("/retrieveAll")
     public ResponseEntity<List<Payment>> getAllPayments() {
+        logger.info("Retrieving all payments");
+        
         List<Payment> payments = paymentService.getAllPayments();
+        logger.info("Retrieved {} payments", payments.size());
+
         return ResponseEntity.ok(payments);
     }
 
     // Update a payment by ID
     @PutMapping("update/{id}")
     public ResponseEntity<Payment> updatePayment(@PathVariable("id") int paymentId, @RequestBody Payment updatedPayment) throws PaymentFailedException {
+        logger.info("Updating payment with ID: {} with new details: {}", paymentId, updatedPayment);
+        
         Payment payment = paymentService.updatePayment(paymentId, updatedPayment);
+        logger.info("Updated payment: {}", payment);
+
         return ResponseEntity.ok(payment);
     }
 
     // Delete a payment by ID
     @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deletePayment(@PathVariable("id") int paymentId) {
+        logger.info("Deleting payment with ID: {}", paymentId);
+        
         paymentService.deletePayment(paymentId);
+        logger.info("Payment with ID: {} deleted successfully", paymentId);
+
         return ResponseEntity.ok("Payment deleted successfully.");
     }
     
@@ -105,6 +136,7 @@ public class PaymentController {
  // get payments by userId
     @GetMapping("/user/{userId}")
     public List<Payment> getPaymentsByUserId(@PathVariable int userId) {
+        logger.info("Fetched payments with User ID: {}", userId);
         return paymentService.getPaymentsByUserId(userId);
     }
 }
