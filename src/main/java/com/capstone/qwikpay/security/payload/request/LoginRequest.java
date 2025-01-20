@@ -2,7 +2,9 @@ package com.capstone.qwikpay.security.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 
+import lombok.Generated;
 
+@Generated
 public class LoginRequest {
 	@NotBlank
 	private String username;

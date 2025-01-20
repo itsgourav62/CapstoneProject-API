@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Generated
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

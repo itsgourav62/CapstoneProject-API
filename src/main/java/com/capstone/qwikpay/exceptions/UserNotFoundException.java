@@ -1,5 +1,7 @@
 package com.capstone.qwikpay.exceptions;
+import lombok.Generated;
 
+@Generated
 public class UserNotFoundException extends Exception{
 
 	public UserNotFoundException() {
