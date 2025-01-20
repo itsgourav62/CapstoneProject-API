@@ -30,6 +30,8 @@ import com.capstone.qwikpay.security.payload.request.SignUpRequest;
 import com.capstone.qwikpay.security.payload.response.JwtResponse;
 import com.capstone.qwikpay.security.payload.response.MessageResponse;
 import com.capstone.qwikpay.services.UserDetailsImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.validation.Valid;
 
@@ -37,6 +39,7 @@ import jakarta.validation.Valid;
 @CrossOrigin("*")
 @RequestMapping("/api/auth")
 public class AuthController {
+	 private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 	@Autowired
 	private UserRepository userRepository;
@@ -70,58 +73,72 @@ public class AuthController {
 		return ResponseEntity.ok(new MessageResponse("User with username "+userDetails.getUsername()+" Logged in Successfully "));
 	}**/
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        logger.info("User login attempt for username: {}", loginRequest.getUsername());
 
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), 
-						loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), 
+                            loginRequest.getPassword()));
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
+            
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-		return ResponseEntity.ok(new JwtResponse(jwt, 
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
-												 roles));
-	}
-	 
+            logger.info("User '{}' successfully authenticated", loginRequest.getUsername());
+            return ResponseEntity.ok(new JwtResponse(jwt, 
+                                                     userDetails.getId(), 
+                                                     userDetails.getUsername(), 
+                                                     userDetails.getEmail(), 
+                                                     roles));
+        } catch (Exception e) {
+            logger.error("Authentication failed for user: {}", loginRequest.getUsername(), e);
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Authentication failed"));
+        }
+    }
+
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-		}
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        logger.info("Attempt to register user with username: {}", signUpRequest.getUsername());
 
-		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-		}
-		
-		if(userRepository.existsByMobile(signUpRequest.getMobile())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Mobile is already in user!"));
-		}
-		
-		// Create new user's account
-		UserEntity user = new UserEntity(signUpRequest.getUsername(), signUpRequest.getEmail(),
-				encoder.encode(signUpRequest.getPassword()));
-		
-		//Add roles and other properties
-		user.setRoles(getRoles(signUpRequest));
-		user.setAddress(signUpRequest.getAddress());
-		user.setEmail(signUpRequest.getEmail());
-		user.setMobile(signUpRequest.getMobile());
-		user.setGender(signUpRequest.getGender());
-		// saving UserEntity to the database
-		userRepository.save(user);
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            logger.warn("Username '{}' is already taken", signUpRequest.getUsername());
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            logger.warn("Email '{}' is already in use", signUpRequest.getEmail());
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
 
-	}
+        if(userRepository.existsByMobile(signUpRequest.getMobile())) {
+            logger.warn("Mobile '{}' is already in use", signUpRequest.getMobile());
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Mobile is already in use!"));
+        }
+
+        // Create new user's account
+        UserEntity user = new UserEntity(signUpRequest.getUsername(), signUpRequest.getEmail(),
+                encoder.encode(signUpRequest.getPassword()));
+        
+        // Add roles and other properties
+        user.setRoles(getRoles(signUpRequest));
+        user.setAddress(signUpRequest.getAddress());
+        user.setEmail(signUpRequest.getEmail());
+        user.setMobile(signUpRequest.getMobile());
+        user.setGender(signUpRequest.getGender());
+        
+        // Saving UserEntity to the database
+        userRepository.save(user);
+
+        logger.info("User '{}' registered successfully", signUpRequest.getUsername());
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
 	
 	//Get Roles from DB if not present in SignupRequest
 	public Set<Role> getRoles(SignUpRequest signupRequest){
@@ -163,25 +180,33 @@ public class AuthController {
 	}
 	
 	@PostMapping("/forgot-password")
-	public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> passwordDetails) {
-	    String email = passwordDetails.get("email");
-	    String newPassword = passwordDetails.get("password");
-	    String confirmPassword = passwordDetails.get("confirmPassword");
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> passwordDetails) {
+        String email = passwordDetails.get("email");
+        String newPassword = passwordDetails.get("password");
+        String confirmPassword = passwordDetails.get("confirmPassword");
 
-	    // Check if the email exists in the database
-	    UserEntity user = userRepository.findByEmail(email)
-	            .orElseThrow(() -> new RuntimeException("Error: User not found with email: " + email));
+        logger.info("Password reset request for email: {}", email);
 
-	    // Check if password and confirmPassword match
-	    if (!newPassword.equals(confirmPassword)) {
-	        return ResponseEntity.badRequest().body(new MessageResponse("Error: Password and Confirm Password do not match!"));
-	    }
+        try {
+            // Check if the email exists in the database
+            UserEntity user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Error: User not found with email: " + email));
 
-	    // Update the user's password
-	    user.setPassword(encoder.encode(newPassword));
-	    userRepository.save(user);
+            // Check if password and confirmPassword match
+            if (!newPassword.equals(confirmPassword)) {
+                logger.warn("Password and Confirm Password do not match for email: {}", email);
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: Password and Confirm Password do not match!"));
+            }
 
-	    return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
-	}
+            // Update the user's password
+            user.setPassword(encoder.encode(newPassword));
+            userRepository.save(user);
 
+            logger.info("Password successfully updated for email: {}", email);
+            return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
+        } catch (Exception e) {
+            logger.error("Error occurred while resetting password for email: {}", email, e);
+            return ResponseEntity.status(500).body(new MessageResponse("Error: Unable to reset password"));
+        }
+    }
 }
