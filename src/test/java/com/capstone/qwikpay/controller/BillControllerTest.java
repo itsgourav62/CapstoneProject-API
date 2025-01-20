@@ -67,6 +67,7 @@ class BillControllerTest {
     }
 
     // 3. Test Update Bill by ID
+
     @Test
     void testUpdateBillById_Success() throws Exception {
         Bill mockBill = new Bill();
@@ -83,6 +84,7 @@ class BillControllerTest {
                 .andExpect(jsonPath("$.description").value("Updated bill"));
     }
 
+
     // 4. Test Delete Bill by ID
     @Test
     void testDeleteBill_Success() throws Exception {
@@ -90,6 +92,7 @@ class BillControllerTest {
 
         mockMvc.perform(delete("/api/bills/delete/1"))
                 .andExpect(status().isNoContent());
+
 
         verify(billService, times(1)).deleteBillById(1);
     }
@@ -149,3 +152,6 @@ class BillControllerTest {
     }
 
 }
+
+
+

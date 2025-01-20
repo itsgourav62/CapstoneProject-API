@@ -58,17 +58,20 @@ public class AuthController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
 		logger.info("User login attempt for username: {}", loginRequest.getUsername());
 
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+
 							loginRequest.getPassword()));
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			String jwt = jwtUtils.generateJwtToken(authentication);
 
 			UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
 			List<String> roles = userDetails.getAuthorities().stream()
 					.map(item -> item.getAuthority())
 					.collect(Collectors.toList());
@@ -82,6 +85,7 @@ public class AuthController {
 					roles));
 		} catch (Exception e) {
 			logger.error("Authentication failed for user: {}", loginRequest.getUsername(), e);
+
 			return ResponseEntity.status(401).body(new MessageResponse("Error: Invalid credentials"));
 		}
 	}

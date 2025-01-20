@@ -169,11 +169,37 @@
 						</goals>
 					</execution>
 					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+
 						<id>report</id>
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
+
+						<configuration>
+							<excludes>
+								<exclude>**/config/**</exclude>
+								<exclude>**/security/**</exclude>
+								<exclude>com/capstone/qwikpay/security/**</exclude>
+								<exclude>com/capstone/qwikpay/enums/**/*</exclude>
+								<exclude>com/capstone/qwikpay/entities/**/*</exclude>
+								<exclude>com/capstone/qwikpay/exceptions/**/*</exclude>
+								
+							</excludes>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
