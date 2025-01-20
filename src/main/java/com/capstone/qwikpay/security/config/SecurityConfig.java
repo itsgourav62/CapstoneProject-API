@@ -23,7 +23,7 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" };
+    public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**" };
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
 
                 // Bill API access control
-                .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
+                 .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/new/**").permitAll()
 //                .requestMatchers("/api/bills/new/**").permitAll() //TODO change the persmission after fixing the issue 
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
@@ -81,6 +81,10 @@ public class SecurityConfig {
             )
             // Disable CSRF for simplicity (not recommended for production)
             .csrf(csrf -> csrf.disable())
+            // Allow H2 console access by disabling frame options
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.disable())
+            )
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
@@ -88,7 +92,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
