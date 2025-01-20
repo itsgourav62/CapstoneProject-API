@@ -25,7 +25,7 @@ import com.capstone.qwikpay.services.PaymentService;
 
 @RestController
 @RequestMapping("/api/payments")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PaymentController {
 
     @Autowired
@@ -99,5 +99,12 @@ public class PaymentController {
     public ResponseEntity<String> deletePayment(@PathVariable("id") int paymentId) {
         paymentService.deletePayment(paymentId);
         return ResponseEntity.ok("Payment deleted successfully.");
+    }
+    
+    
+ // get payments by userId
+    @GetMapping("/user/{userId}")
+    public List<Payment> getPaymentsByUserId(@PathVariable int userId) {
+        return paymentService.getPaymentsByUserId(userId);
     }
 }

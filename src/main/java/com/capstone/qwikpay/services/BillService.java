@@ -28,4 +28,6 @@ public interface BillService {
     // Delete bill by its ID
     void deleteBillById(Integer billId) throws BillNotFoundException;
 
+    
+//    List<Bill> getBillsByUserIdWithPayments(Integer userId); 
 }

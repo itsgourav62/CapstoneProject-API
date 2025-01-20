@@ -1,6 +1,7 @@
 package com.capstone.qwikpay.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,10 +15,13 @@ public interface PaymentRepository extends CrudRepository<Payment, Integer> {
 
     //List<Payment> findByBillId(Integer billId);
 
+	// Fetch payment by its ID
+//	Optional<Payment> findById(Integer pmtId);  
     List<Payment> findByPaymentStatus(String paymentStatus);
     
 //    List<Payment> findByUserId(int userId);
-    
-    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.bill.billId = :billId")
-    Double getTotalPaidAmountForBill(@Param("billId") Integer billId);
+ 
+    // Fetch payments based on userId (through the Bill -> UserEntity relationship)
+    @Query("SELECT p FROM Payment p WHERE p.bill.user.id = :userId")
+    List<Payment> findPaymentsByUserId(@Param("userId") int userId);
 }

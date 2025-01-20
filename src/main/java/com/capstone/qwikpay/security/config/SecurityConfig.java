@@ -60,22 +60,23 @@ public class SecurityConfig {
                 .requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
 
                 // Bill API access control
-                .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
+                 .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/new/**").permitAll()
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/bills/user/{userId}").hasRole("ADMIN")
+                .requestMatchers("/api/bills/user/{userId}").permitAll()
                 .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
 
                 // Payment API access control
-                .requestMatchers("/api/payments/process").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/process").permitAll()
                 .requestMatchers("/api/payments/update/{id}").hasRole("ADMIN")
                 .requestMatchers("/api/payments/retrieveById/{id}").permitAll()
                 .requestMatchers("/api/payments/retrieveAll").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/getStatusById").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/payments/delete/{id}").hasAnyRole("ADMIN")
-                .requestMatchers("/api/payments/retrieveByStatus/{status}").permitAll()
+                .requestMatchers("/api/payments/retrieveByStatus/{status}").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/payments/user/{userId}").permitAll()
             )
             // Disable CSRF for simplicity (not recommended for production)
             .csrf(csrf -> csrf.disable())

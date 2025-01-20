@@ -17,7 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,6 +28,9 @@ import com.capstone.qwikpay.entities.Role;
 import com.capstone.qwikpay.entities.UserEntity;
 import com.capstone.qwikpay.enums.ERole;
 import com.capstone.qwikpay.repositories.RoleRepository;
+
+import com.capstone.qwikpay.entities.UserEntity;
+
 import com.capstone.qwikpay.repositories.UserRepository;
 import com.capstone.qwikpay.security.jwt.JwtUtils;
 import com.capstone.qwikpay.security.payload.request.LoginRequest;
@@ -41,9 +46,11 @@ class AuthControllerTest {
     private PasswordEncoder encoder;
 
     @Mock
+
     private RoleRepository roleRepository;
 
     @Mock
+
     private AuthenticationManager authenticationManager;
 
     @Mock
@@ -99,6 +106,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Password updated successfully!"));
     }
 
+
     @Test
     void testRegisterUser_Success() throws Exception {
         // Creating the request body JSON
@@ -142,3 +150,9 @@ class AuthControllerTest {
     }
 
 }
+
+
+
+
+}
+

@@ -42,7 +42,9 @@ public class BillController {
         return ResponseEntity.ok(bills);
     }
 
+    
     // Get bills by userId
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Bill>> getBillsByUserId(@PathVariable Integer userId) {
         List<Bill> bills = billService.getBillsByUserId(userId);
