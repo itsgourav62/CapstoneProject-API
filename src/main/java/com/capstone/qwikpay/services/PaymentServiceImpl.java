@@ -26,22 +26,22 @@ public class PaymentServiceImpl implements PaymentService {
    
     @Transactional
     @Override
-    public Payment processPayment(Payment payment) throws PaymentFailedException {
-        // Ensure bill_id is provided
+    public Payment processPayment(Payment payment) {
+        // Ensure Bill is not null
         if (payment.getBill() == null || payment.getBill().getBillId() == null) {
-            throw new PaymentFailedException("Bill information is missing or Bill ID is null for the payment.");
+            throw new RuntimeException("Bill information is missing or Bill ID is null for the payment.");
         }
 
         // Fetch the Bill using the provided Bill ID
         Bill bill = billRepository.findById(payment.getBill().getBillId())
-                .orElseThrow(() -> new PaymentFailedException("Bill not found with ID: " + payment.getBill().getBillId()));
+                .orElseThrow(() -> new RuntimeException("Bill not found with ID: " + payment.getBill().getBillId()));
 
         // Associate the Bill with the Payment
         payment.setBill(bill);
 
         // Update payment status
         payment.setPaymentStatus("Paid");
-        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentDate(java.time.LocalDateTime.now());
 
         // Update the bill status based on payment status
         if ("Paid".equals(payment.getPaymentStatus())) {
@@ -50,9 +50,14 @@ public class PaymentServiceImpl implements PaymentService {
             bill.setBillStatus("Pending");
         }
 
-        // Save the updated bill and payment
+        // Save the updated payment
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // Ensure that the pmt_id is updated in the bill_details table
+        bill.setPayment(savedPayment);
         billRepository.save(bill);
-        return paymentRepository.save(payment);
+
+        return savedPayment;
     }
 
 
@@ -134,13 +139,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 
 
-	@Override
-	public List<Payment> getPaymentsByUserId(int userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 
 	@Override
     public List<Payment> getPaymentByStatus(String paymentStatus) {
@@ -151,10 +149,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
-
-//    @Override
-//    public List<Payment> getPaymentsByUserId(int userId) {
-//        // Assuming you have a user relationship with payments, fetch payments by userId
-//        return paymentRepository.findByUserId(userId);
-//    }
+	// method to fetch payments by userId
+    @Override
+    public List<Payment> getPaymentsByUserId(int userId) {
+        return paymentRepository.findPaymentsByUserId(userId);
+    }
 }
