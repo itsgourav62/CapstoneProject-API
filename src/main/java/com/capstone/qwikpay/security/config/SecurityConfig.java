@@ -62,11 +62,10 @@ public class SecurityConfig {
                 // Bill API access control
                  .requestMatchers("/api/bills/update/{billId}/**").hasRole("ADMIN")
                 .requestMatchers("/api/bills/new/**").permitAll()
-//                .requestMatchers("/api/bills/new/**").permitAll() //TODO change the persmission after fixing the issue 
                 .requestMatchers("/api/bills/{status}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/retrieveBillById/{billId}/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/user/{userId}").permitAll()
-                .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/api/bills/retrievAll").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/bills/delete/{billId}").hasRole("ADMIN")
 
                 // Payment API access control
