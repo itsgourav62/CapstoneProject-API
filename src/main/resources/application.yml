@@ -29,10 +29,21 @@ jwtExpirationMs: 86400000
 
 # Logging Configuration
 logging:
-  level:
-    org.springframework.security: DEBUG
-   # com.training.basicspringsecuritydemousingdb.security: DEBUG
-    org.springframework.web.filter: DEBUG
+  # File logging configuration
+  file:
+    name: logs/app.log  # Log file location and name
+  
+  # Logback rolling policy configuration
+  logback:
+    rollingpolicy:
+      # Define the pattern for rolling log file names (logs will be based on date and index)
+      file-name-pattern: logs/%d{yyyy-MM-dd}.%i.log
+      # Maximum size of each log file before it rolls over
+      max-file-size: 10MB
+      # Maximum total size of all log files before older ones are deleted
+      total-size-cap: 1GB
+      # Maximum number of log file history (older files are deleted after this limit)
+      max-history: 10
 
 # MySQL Configuration (Commented out for now)
 # datasource:

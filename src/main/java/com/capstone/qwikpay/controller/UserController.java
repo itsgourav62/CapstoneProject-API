@@ -16,57 +16,76 @@ import org.springframework.web.bind.annotation.RestController;
 import com.capstone.qwikpay.entities.UserEntity;
 import com.capstone.qwikpay.exceptions.UserNotFoundException;
 import com.capstone.qwikpay.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/api/user")
 public class UserController {
-	
-	@Autowired
-	private UserService service;
-	
-	/*
-	 * //Create user
-	 * 
-	 * @PreAuthorize("hasRole('ADMIN')")
-	 * 
-	 * @PostMapping("/new") public UserEntity addNewUser(@RequestBody UserEntity
-	 * user) { //Check for roles if it's null then add default role USER
-	 * if(user.getRoles() == null) {
-	 * user.setRoles(roleUtility.getRolesFromDB(user.getRoles())); }
-	 * 
-	 * return service.addNewUser(user); }
-	 */
-	
-	
-	//Get user by Id
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/get/{id}")
-	public UserEntity getUser(@PathVariable("id")Integer userId) throws UserNotFoundException {
-		return service.getUser(userId);
-	}
-	
-	//Update user by Id
-	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("/update")
-	public UserEntity updateUser(@RequestBody UserEntity user) throws UserNotFoundException {
-		return service.updateUser(user);
-	}
-	
-	//Delete user by id
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/delete/{id}")
-	public String deleteUser(@PathVariable("id") Integer userId) throws UserNotFoundException {
-		return service.deleteUser(userId);
-	}
-	
-	// committed the code
-	//Get all users 
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/users")
-	public List<UserEntity> getUsers(){
-		return service.getUsers();
-	}
-	
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private UserService service;
+
+    // Get user by Id
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/get/{id}")
+    public UserEntity getUser(@PathVariable("id") Integer userId) throws UserNotFoundException {
+        logger.info("Fetching user with ID: {}", userId);
+        
+        try {
+            UserEntity user = service.getUser(userId);
+            logger.info("User found with ID: {}", userId);
+            return user;
+        } catch (UserNotFoundException e) {
+            logger.error("User with ID {} not found", userId);
+            throw e;
+        }
+    }
+
+    // Update user by Id
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update")
+    public UserEntity updateUser(@RequestBody UserEntity user) throws UserNotFoundException {
+        logger.info("Updating user with ID: {}", user.getId());
+
+        try {
+            UserEntity updatedUser = service.updateUser(user);
+            logger.info("User with ID {} updated successfully", user.getId());
+            return updatedUser;
+        } catch (UserNotFoundException e) {
+            logger.error("User with ID {} not found for update", user.getId());
+            throw e;
+        }
+    }
+
+    // Delete user by id
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer userId) throws UserNotFoundException {
+        logger.info("Deleting user with ID: {}", userId);
+
+        try {
+            String response = service.deleteUser(userId);
+            logger.info("User with ID {} deleted successfully", userId);
+            return response;
+        } catch (UserNotFoundException e) {
+            logger.error("User with ID {} not found for deletion", userId);
+            throw e;
+        }
+    }
+
+    // Get all users
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users")
+    public List<UserEntity> getUsers() {
+        logger.info("Fetching all users");
+        
+        List<UserEntity> users = service.getUsers();
+        logger.info("Retrieved {} users", users.size());
+        return users;
+    }
 }
