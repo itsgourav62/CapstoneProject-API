@@ -17,11 +17,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.capstone.qwikpay.entities.Role;
 import com.capstone.qwikpay.entities.UserEntity;
+import com.capstone.qwikpay.enums.ERole;
+import com.capstone.qwikpay.repositories.RoleRepository;
 import com.capstone.qwikpay.repositories.UserRepository;
 import com.capstone.qwikpay.security.jwt.JwtUtils;
 import com.capstone.qwikpay.security.payload.request.LoginRequest;
@@ -35,6 +39,9 @@ class AuthControllerTest {
 
     @Mock
     private PasswordEncoder encoder;
+
+    @Mock
+    private RoleRepository roleRepository;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -92,7 +99,46 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Password updated successfully!"));
     }
 
+    @Test
+    void testRegisterUser_Success() throws Exception {
+        // Creating the request body JSON
+        String requestBody = "{\"username\":\"newuser\", \"email\":\"newuser@example.com\", \"password\":\"password\", " +
+                "\"mobile\":\"1234567890\", \"address\":\"1234 Elm St\", \"gender\":\"M\", \"role\":[\"user\"]}";
 
+        // Create a SignUpRequest for testing
+        SignUpRequest signUpRequest = new SignUpRequest("newuser", "newuser@example.com", Set.of("user"), "password", "1234567890", "1234 Elm St", "M");
 
+        when(encoder.encode(signUpRequest.getPassword())).thenReturn("encodedPassword");
+        Role roleUser = new Role();
+        roleUser.setName(ERole.ROLE_USER);
+        when(roleRepository.save(any(Role.class))).thenReturn(roleUser);
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(roleUser));
+        when(userRepository.existsByUsername("newuser")).thenReturn(false);
+        when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
+        when(encoder.encode(signUpRequest.getPassword())).thenReturn("encodedPassword");
+        when(userRepository.save(any(UserEntity.class))).thenReturn(new UserEntity("newuser", "newuser@example.com", "encodedPassword"));
+
+        // Perform the test
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("User registered successfully!"));
+    }
+
+    @Test
+    void testAuthenticateUser_InvalidCredentials() throws Exception {
+        // Creating the request body JSON
+        String requestBody = "{\"username\":\"user1\", \"password\":\"wrongPassword\"}";
+
+        // Mock the authentication process to throw an exception
+        when(authenticationManager.authenticate(any())).thenThrow(new RuntimeException("Invalid credentials"));
+
+        // Perform the test
+        mockMvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
 
 }

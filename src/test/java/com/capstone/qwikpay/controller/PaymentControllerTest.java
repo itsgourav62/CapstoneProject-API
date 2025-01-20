@@ -103,4 +103,71 @@ public class PaymentControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(payment, response.getBody());
     }
+
+    @Test
+    void testGetAllPayments() {
+        List<Payment> payments = Arrays.asList(new Payment(), new Payment());
+
+        when(paymentService.getAllPayments()).thenReturn(payments);
+
+        ResponseEntity<List<Payment>> response = paymentController.getAllPayments();
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(payments, response.getBody());
+    }
+
+    @Test
+    void testUpdatePayment_Success() throws PaymentFailedException {
+        int paymentId = 1;
+        Payment updatedPayment = new Payment();
+        Payment payment = new Payment();
+        when(paymentService.updatePayment(paymentId, updatedPayment)).thenReturn(payment);
+
+        ResponseEntity<Payment> response = paymentController.updatePayment(paymentId, updatedPayment);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(payment, response.getBody());
+    }
+
+    @Test
+    void testUpdatePayment_Failure() throws PaymentFailedException {
+        int paymentId = 1;
+        Payment updatedPayment = new Payment();
+
+        when(paymentService.updatePayment(paymentId, updatedPayment)).thenThrow(new PaymentFailedException("Update failed"));
+
+        Exception exception = assertThrows(PaymentFailedException.class, () -> {
+            paymentController.updatePayment(paymentId, updatedPayment);
+        });
+
+        assertEquals("Update failed", exception.getMessage());
+    }
+
+    @Test
+    void testDeletePayment_Success() {
+        int paymentId = 1;
+
+        doNothing().when(paymentService).deletePayment(paymentId);
+
+        ResponseEntity<String> response = paymentController.deletePayment(paymentId);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Payment deleted successfully.", response.getBody());
+    }
+
+    @Test
+    void testDeletePayment_Failure() {
+        int paymentId = 1;
+
+        doThrow(new RuntimeException("Delete failed")).when(paymentService).deletePayment(paymentId);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            paymentController.deletePayment(paymentId);
+        });
+
+        assertEquals("Delete failed", exception.getMessage());
+    }
 }
