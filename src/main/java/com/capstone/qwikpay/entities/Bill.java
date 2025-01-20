@@ -22,7 +22,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from serialization
 public class Bill {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer billId;
 
@@ -37,7 +37,7 @@ public class Bill {
     private String description;
 
     @Column(name = "due_date")
-    @JsonProperty("due_date") // Rename for JSON output
+    @JsonProperty("due_date")
     private LocalDateTime dueDate;
 
     @Column(name = "created_at", updatable = false)
@@ -53,8 +53,9 @@ public class Bill {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity user;
 
-    @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL)
-    @JsonIgnore // Prevent circular reference during serialization
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pmt_id", referencedColumnName = "pmtId", unique = true)
+    @JsonIgnore
     private Payment payment;
 
     // Custom constructor for deserialization
