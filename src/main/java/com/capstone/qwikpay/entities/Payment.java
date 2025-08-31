@@ -38,6 +38,46 @@ public class Payment {
     @JsonIgnore // Prevent full serialization of the Bill object
     private Bill bill;
     
+    // Manual getters and setters to ensure they're available
+    public Integer getPmtId() {
+        return pmtId;
+    }
+
+    public void setPmtId(Integer pmtId) {
+        this.pmtId = pmtId;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public LocalDateTime getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(LocalDateTime paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public Bill getBill() {
+        return bill;
+    }
+
+    public void setBill(Bill bill) {
+        this.bill = bill;
+    }
     
     @JsonProperty("bill_id")
     public Integer getBillId() {

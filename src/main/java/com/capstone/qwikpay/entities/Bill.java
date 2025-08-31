@@ -14,11 +14,6 @@ import lombok.*;
 import lombok.Generated;
 
 @Generated
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
-@Getter
-@ToString
 @Entity
 @Table(name = "bill_details")
 @JsonInclude(JsonInclude.Include.NON_NULL) // Exclude null fields from serialization
@@ -60,8 +55,93 @@ public class Bill {
     @JsonIgnore
     private Payment payment;
 
+    // Default constructor for JPA and tests
+    public Bill() {
+    }
+
     // Custom constructor for deserialization
     public Bill(Integer billId) {
         this.billId = billId;
+    }
+
+    // Manual getters and setters to ensure they're available
+    public Integer getBillId() {
+        return billId;
+    }
+
+    public void setBillId(Integer billId) {
+        this.billId = billId;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public String getBillType() {
+        return billType;
+    }
+
+    public void setBillType(String billType) {
+        this.billType = billType;
+    }
+
+    public String getBillStatus() {
+        return billStatus;
+    }
+
+    public void setBillStatus(String billStatus) {
+        this.billStatus = billStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDateTime dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }

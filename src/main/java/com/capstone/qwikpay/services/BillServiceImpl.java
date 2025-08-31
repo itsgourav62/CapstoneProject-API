@@ -44,6 +44,7 @@ public class BillServiceImpl implements BillService {
     }
 
     // Retrieve bills by User ID
+    @Override
     public List<Bill> getBillsByUserId(Integer userId) {
         logger.info("Fetching bills for user ID: {}", userId);
         List<Bill> bills = billRepository.findByUserId(userId);

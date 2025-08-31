@@ -73,7 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info("Validating payment with Payment ID: {}", paymentId);
         return paymentRepository.findById(paymentId)
                 .map(payment -> {
-                    boolean isValid = "PAID".equalsIgnoreCase(payment.getPaymentStatus());
+                    boolean isValid = "Paid".equalsIgnoreCase(payment.getPaymentStatus());
                     logger.info("Payment validation result for Payment ID {}: {}", paymentId, isValid);
                     return isValid;
                 })
@@ -114,7 +114,8 @@ public class PaymentServiceImpl implements PaymentService {
                 });
 
         // Check if the payment is already completed and prevent modification
-        if ("COMPLETED".equalsIgnoreCase(existingPayment.getPaymentStatus())) {
+        if ("Paid".equalsIgnoreCase(existingPayment.getPaymentStatus()) || 
+            "COMPLETED".equalsIgnoreCase(existingPayment.getPaymentStatus())) {
             logger.error("Cannot update a completed payment with Payment ID: {}", paymentId);
             throw new PaymentFailedException("Cannot update a completed payment.");
         }
@@ -127,10 +128,11 @@ public class PaymentServiceImpl implements PaymentService {
         // Update the associated bill status based on the payment status
         Bill bill = existingPayment.getBill();
         if (bill != null) {
-            if ("PAID".equalsIgnoreCase(updatedPayment.getPaymentStatus())) {
-                bill.setBillStatus("PAID");  // Set the bill status to Paid when payment is completed
+            if ("PAID".equalsIgnoreCase(updatedPayment.getPaymentStatus()) || 
+                "Paid".equalsIgnoreCase(updatedPayment.getPaymentStatus())) {
+                bill.setBillStatus("PAID");  // Set the bill status to PAID when payment is completed
             } else {
-                bill.setBillStatus("PARTIALLY PAID");  // Set to partially paid if not fully completed
+                bill.setBillStatus("Partially Paid");  // Set to partially paid if not fully completed
             }
             bill.setUpdatedAt(LocalDateTime.now()); // Update the updated timestamp
             billRepository.save(bill);  // Save the updated bill
@@ -161,13 +163,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         paymentRepository.deleteById(paymentId);
         logger.info("Payment with Payment ID: {} deleted successfully", paymentId);
-    }
-
-    private void updateBillAfterPayment(Bill bill, Payment payment) {
-        bill.setPayment(payment);
-        bill.setBillStatus(payment.getAmount() >= bill.getAmount() ? "PAID" : "PARTIALLY PAID");
-        bill.setUpdatedAt(LocalDateTime.now());
-        billRepository.save(bill);
     }
 
     @Override
